@@ -29,7 +29,15 @@
 			</div>
 		</div>
 		{* Module Summary View Ends Here*}
-
+		<div class="summaryWidgetContainer">
+			<div class="widgetContainer_plot" data-url="module=Accounts&view=Graphic&id={$RECORD->getId()}">
+				<div class="widget_header clearfix">
+					<h4>{vtranslate('LBL_GRAPHIC', $MODULE_NAME)}</h4>
+				</div>
+				<div class="widget_contents">
+				</div>
+			</div>
+		</div>
 
 		{* Summary View Documents Widget*}
 		{if $DOCUMENT_WIDGET_MODEL}

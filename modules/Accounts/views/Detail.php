@@ -47,7 +47,8 @@ class Accounts_Detail_View extends Vtiger_Detail_View {
 			$viewer->assign('PAGING_MODEL', $pagingModel);
 			$viewer->assign('PAGE_NUMBER', $pageNumber);
 			$viewer->assign('ACTIVITIES', $relatedActivities);
-
+			$viewer->assign('SCRIPTS',$this->getHeaderScripts($request));
+	  		$viewer->assign('STYLES',$this->getHeaderCss($request));
 			return $viewer->view('RelatedActivities.tpl', $moduleName, true);
 		}
 	}
@@ -66,6 +67,34 @@ class Accounts_Detail_View extends Vtiger_Detail_View {
 		$viewer->assign('IMAGE_DETAILS', $recordModel->getImageDetails());
 
 		return parent::showModuleDetailView($request);
+	}
+
+	public function getHeaderScripts(Vtiger_Request $request) {
+		$headerScriptInstances = parent::getHeaderScripts($request);
+		$moduleName = $request->getModule();
+
+		$jsFileNames = array(
+			"~/libraries/jquery/jqplot/jquery.jqplot.min.js",
+			"~/libraries/jquery/jqplot/plugins/jqplot.dateAxisRenderer.js",
+			"~/libraries/jquery/jqplot/plugins/jqplot.canvasAxisRenderer.js",
+			"~/libraries/jquery/jqplot/plugins/jqplot.highlighter.min.js",
+			"~/libraries/jquery/jqplot/plugins/jqplot.cursor.min.js",
+			"~/libraries/jquery/jqplot/plugins/jqplot.pointLabels.min.js",
+		);
+
+		$jsScriptInstances = $this->checkAndConvertJsScripts($jsFileNames);
+		$headerScriptInstances = array_merge($headerScriptInstances, $jsScriptInstances);
+		return $headerScriptInstances;
+	}
+
+	public function getHeaderCss(Vtiger_Request $request) {
+		$headerCssInstances = parent::getHeaderCss($request);
+		$cssFileNames = array(
+			"~/libraries/jquery/jqplot/jquery.jqplot.min.css",
+		);
+		$cssInstances = $this->checkAndConvertCssStyles($cssFileNames);
+		$headerCssInstances = array_merge($headerCssInstances, $cssInstances);
+		return $headerCssInstances;
 	}
 
 }
