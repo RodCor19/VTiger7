@@ -19,6 +19,7 @@ class Accounts_Graphic_View extends Vtiger_View_Controller {
 		}
 		$viewer->assign('MODULE_NAME', $moduleName);
 		$viewer->assign('valores', $tuplas);
+		$viewer->assign('record', $recordId);
 		$viewer->view('Grafica.tpl', $moduleName);
 	}
 
