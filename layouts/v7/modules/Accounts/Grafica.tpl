@@ -18,13 +18,14 @@
 <script type="text/javascript">
   $(document).ready(function(){
     var record = {/literal}{$record}{literal};
-    var grafica = function(datos, labelText, format){
+    var grafica = function(datos, labelText, format, intervalo){
       $('#chart').empty();
       $.jqplot.config.enablePlugins = true;
       var plot1 = $.jqplot('chart', [datos], {
         axes:{
           xaxis:{
-            renderer:$.jqplot.DateAxisRenderer, 
+            renderer:$.jqplot.DateAxisRenderer,
+            tickInterval: intervalo, 
             rendererOptions:{
               tickRenderer:$.jqplot.CanvasAxisTickRenderer
             },
@@ -48,7 +49,7 @@
         }
       });
     };
-    grafica({/literal}{json_encode($valores)}{literal}, '{/literal}{vtranslate("LBL_MONTHS_TYPE", $MODULE_NAME)}{literal}', '%m\'%Y');
+    grafica({/literal}{json_encode($valores)}{literal}, '{/literal}{vtranslate("LBL_MONTHS_TYPE", $MODULE_NAME)}{literal}', '%m\'%y', 2592000000);
     $('#btnBuscar').click(function(e) {
       var campoInicio = $("#fields .inputElement")[0];
       var campoFin = $("#fields .inputElement")[1];
@@ -63,7 +64,7 @@
         function(error,data) {
           if (data.success) {
             data = data['data'];
-            grafica(data.valores, data.label, data.itemsLabels);
+            grafica(data.valores, data.label, data.itemsLabels, data.intervalo);
           } else {
             app.helper.showErrorNotification({'message': data.error});
           }
