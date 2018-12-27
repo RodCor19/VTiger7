@@ -2,7 +2,6 @@
 <div class="plot" id="chart"></div>
 <br>
 <div>
-  <button id="Prueba" class="btn btn-success">Buscar</button>
   <table class="table table-borderless">
     <tbody id='fields'>
       <tr><td class="fieldLabel alignMiddle"><label>Inicio :</label></td><td class="fieldValue"><input class="inputElement" type="date" name="Inicio"></td></tr>
@@ -50,7 +49,7 @@
         }
       });
     };
-    grafica({/literal}{json_encode($valores)}{literal}, '{/literal}{vtranslate("LBL_MONTHS_TYPE", $MODULE_NAME)}{literal}', '%m\'%y', 2592000000);
+    grafica({/literal}{json_encode($valores)}{literal}, '{/literal}{$label}{literal}', '{/literal}{$itemsLabels}{literal}', {/literal}{$intervalo}{literal});
     $('#btnBuscar').click(function(e) {
       var campoInicio = $("#fields .inputElement")[0];
       var campoFin = $("#fields .inputElement")[1];
@@ -66,31 +65,17 @@
           if (data.success) {
             data = data['data'];
             grafica(data.valores, data.label, data.itemsLabels, data.intervalo);
+            if(data.rotacion){
+              var val1 = $(campoInicio).val();
+              $(campoInicio).val($(campoFin).val());
+              $(campoFin).val(val1);
+            }
           } else {
             app.helper.showErrorNotification({'message': data.error});
           }
         },
         function(error,err){
 
-        }
-        );
-    });
-    $('#Prueba').click(function(e) {
-      var campoInicio = $("#fields .inputElement")[0];
-      var campoFin = $("#fields .inputElement")[1];
-      var params = {
-        'module' : 'Accounts',
-        'action' : 'DataInvoice',
-        'record' : record,
-        'inicio' : $(campoInicio).val(),
-        'fin' : $(campoFin).val()
-      };
-      app.request.get({data:params}).then(
-        function(error,data) {
-          console.log(data);
-        },
-        function(error,err){
-          console.log(error);
         }
         );
     });

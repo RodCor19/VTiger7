@@ -12,93 +12,51 @@ class Accounts_DataInvoice_Action extends Vtiger_Action_Controller {
 		$finalDate = $request->get('fin');
 		$recordId = $request->get('record');
 		$tuplas = null;
-		global $adb;
 		$result = array();
 		$resultado = null;
-		$intervaloDia = false;
 		$intervalo = 0;
 		$dias = null;
 		$diasConValores = null;
+		$rotacionFechas = false;
+		global $adb;
 
+		if ($finalDate != null && $initialDate != null && new DateTime($initialDate) > new DateTime($finalDate)) {
+			$aux = $finalDate;
+			$finalDate = $initialDate;
+			$initialDate = $aux;
+			$rotacionFechas = true;
+		}
 
 		if ($finalDate != null && $initialDate != null) {
-			$datetime1 = new DateTime($finalDate);
-			$datetime2 = new DateTime($initialDate);
-			if ($datetime1->diff($datetime2)->d < 30 && $datetime1->diff($datetime2)->m < 1) {
-				$intervaloDia = true;
-				//86400000 son los milisegundos en un dia, segun la cantidad de dias
-				// modifica el intervalo
-				if($datetime1->diff($datetime2)->d < 11)
-					$intervalo = 86400000;
-				if($datetime1->diff($datetime2)->d > 10)
-					$intervalo = 86400000*2;
-				if($datetime1->diff($datetime2)->d > 20)
-					$intervalo = 86400000*3;
-				$datetime1->add(new DateInterval('P1D'));
-				while ($datetime1->diff($datetime2)->d !=0 || $datetime1->diff($datetime2)->m != 0){
-					$dias[] =  $datetime2->format('Y-m-d');
-					$datetime2->add(new DateInterval('P1D'));
-				}
-				
-				
-				$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m-%d') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate between ? and ? group by invoicedate;", array($recordId, $initialDate, $finalDate));
-			}else{
-				$stringFecha = $datetime1->format('Y-m').'-01';
-				$datetime1 = new DateTime($stringFecha);
-				$datetime1->add(new DateInterval('P1M'));
-				$stringFecha = $datetime2->format('Y-m').'-01';
-				$datetime2 = new DateTime($stringFecha);
-				while ( $datetime1->diff($datetime2)->m != 0  || $datetime1->diff($datetime2)->y != 0){
-					$dias[] =  $datetime2->format('Y-m').'-01';
-					$datetime2->add(new DateInterval('P1M'));
-				}
-				$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate between ? and ? group by DATE_FORMAT(invoicedate, '%Y-%c');", array($recordId, $initialDate, $finalDate));
-			}
+			$intervalo = $this->intervalo($initialDate,$finalDate);
+			$dias = $this->arrayDias($initialDate,$finalDate);
 		}else{
 			if ($finalDate != null ) {
-				$datetime1 = new DateTime($finalDate);
-				$stringFecha = $datetime1->format('Y-m').'-01';
-				$datetime1 = new DateTime($stringFecha);
-				$datetime1->add(new DateInterval('P1M'));
-				$resultado = $adb->pquery("SELECT DATE_FORMAT(MIN(invoicedate), '%Y-%m') as 'date' FROM vtiger_invoice WHERE accountid = ?;", array($recordId));
-				$stringFecha = $resultado->fields['date'].'-01';
-				$datetime2 = new DateTime($stringFecha);
-				while ( $datetime1->diff($datetime2)->m != 0  || $datetime1->diff($datetime2)->y != 0){
-					$dias[] =  $datetime2->format('Y-m').'-01';
-					$datetime2->add(new DateInterval('P1M'));
+				$initial = $this->fechaMinima($recordId);
+				if($initial != null){
+					$intervalo = $this->intervalo($initial,$finalDate);
+					$dias = $this->arrayDias($initial,$finalDate);
 				}
-				$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate <= ? group by DATE_FORMAT(invoicedate, '%Y-%c')", array($recordId, $finalDate));
 			}elseif ($initialDate != null) {
-				$datetime2 = new DateTime($initialDate);
-				$stringFecha = $datetime2->format('Y-m').'-01';
-				$datetime2 = new DateTime($stringFecha);
-				$resultado = $adb->pquery("SELECT DATE_FORMAT(MIN(invoicedate), '%Y-%m') as 'date' FROM vtiger_invoice WHERE accountid = ?;", array($recordId));
-				$stringFecha = $resultado->fields['date'].'-01';
-				$datetime1 = new DateTime($stringFecha);
-				$datetime1->add(new DateInterval('P1M'));
-				while ( $datetime1->diff($datetime2)->m != 0  || $datetime1->diff($datetime2)->y != 0){
-					$dias[] =  $datetime2->format('Y-m').'-01';
-					$datetime2->add(new DateInterval('P1M'));
+				$final = $this->fechaMaxima($recordId);
+				if($final != null){
+					$intervalo = $this->intervalo($initialDate,$final);
+					$dias = $this->arrayDias($initialDate,$final);
 				}
-				$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate >= ? group by DATE_FORMAT(invoicedate, '%Y-%c')", array($recordId, $initialDate));
 			}else{
-				$resultado = $adb->pquery("SELECT DATE_FORMAT(MIN(invoicedate), '%Y-%m') as 'date' FROM vtiger_invoice WHERE accountid = ?;", array($recordId));
-				$stringFecha = $resultado->fields['date'].'-01';
-				$datetime2 = new DateTime($stringFecha);
-				$resultado = $adb->pquery("SELECT DATE_FORMAT(MAX(invoicedate), '%Y-%m') as 'date' FROM vtiger_invoice WHERE accountid = ?;", array($recordId));
-				$stringFecha = $resultado->fields['date'].'-01';
-				$datetime1 = new DateTime($stringFecha);
-				$datetime1->add(new DateInterval('P1M'));
-				while ( $datetime1->diff($datetime2)->m != 0  || $datetime1->diff($datetime2)->y != 0){
-					$dias[] =  $datetime2->format('Y-m').'-01';
-					$datetime2->add(new DateInterval('P1M'));
+				$initial = $this->fechaMinima($recordId);
+				$final = $this->fechaMaxima($recordId);
+				if($final != null && $initial != null){
+					$intervalo = $this->intervalo($initial,$final);
+					$dias = $this->arrayDias($initial,$final);
 				}
-				$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? group by DATE_FORMAT(invoicedate, '%Y-%c');", array($recordId));
 			}
 		}
+		$resultado = $this->consulta($recordId, $initialDate, $finalDate, $intervalo);
+
 		if ($resultado && $adb->num_rows($resultado) > 0) {
 			foreach ($resultado as $value) {
-				if ($intervaloDia) {
+				if ($intervalo < 2592000000) {
 					$diasConValores[] = $value['date'];
 					$tuplas[] = array($value['date'], doubleval($value['total']));
 				} else {
@@ -111,15 +69,14 @@ class Accounts_DataInvoice_Action extends Vtiger_Action_Controller {
 					$tuplas[] = array($value, 0);
 				}
 			}
-			if ($intervaloDia) {
+			if ($intervalo < 2592000000) {
 				$result['success'] = true;
-				$result['data'] = array('valores' => $tuplas, 'label' => vtranslate("LBL_DAYS_TYPE", $moduleName), 'itemsLabels' => '%d-%m', 'intervalo' => $intervalo);
+				$result['data'] = array('valores' => $tuplas, 'label' => vtranslate("LBL_DAYS_TYPE", $moduleName), 'itemsLabels' => '%d-%m', 'intervalo' => $intervalo, 'rotacion' => $rotacionFechas);
 			} else {
 				$result['success'] = true;
 				// 2592000000 son los milisegundos en 30 dias
-				$result['data'] = array('valores' => $tuplas, 'label' => vtranslate("LBL_MONTHS_TYPE", $moduleName), 'itemsLabels' => '%m\'%Y', 'intervalo' => 2592000000, 'meses' => $dias);
+				$result['data'] = array('valores' => $tuplas, 'label' => vtranslate("LBL_MONTHS_TYPE", $moduleName), 'itemsLabels' => '%m\'%Y', 'intervalo' => $intervalo, 'rotacion' => $rotacionFechas);
 			}
-			
 			
 		}else{
 			$result['success'] = false;
@@ -139,9 +96,9 @@ class Accounts_DataInvoice_Action extends Vtiger_Action_Controller {
 		$datetimeFin = new DateTime($fin);
 		$datetimeInicio = new DateTime($inicio);
 		$dias = null;
-		if ($datetimeFin->diff($datetimeInicio)->d < 30 && $datetimeFin->diff($datetimeInicio)->m < 1) {
+		if ($datetimeFin->diff($datetimeInicio)->d < 30 && $datetimeFin->diff($datetimeInicio)->m < 1 && $datetimeFin->diff($datetimeInicio)->y < 1) {
 			$datetimeFin->add(new DateInterval('P1D'));
-			while ($datetime1->diff($datetimeInicio)->d !=0 || $datetimeFin->diff($datetimeInicio)->m != 0){
+			while ($datetimeFin->diff($datetimeInicio)->d !=0 || $datetimeFin->diff($datetimeInicio)->m != 0){
 				$dias[] =  $datetimeInicio->format('Y-m-d');
 				$datetimeInicio->add(new DateInterval('P1D'));
 			}
@@ -151,7 +108,7 @@ class Accounts_DataInvoice_Action extends Vtiger_Action_Controller {
 			$stringFecha = $datetimeInicio->format('Y-m').'-01';
 			$datetimeInicio = new DateTime($stringFecha);
 			$datetimeFin->add(new DateInterval('P1M'));
-			while ( $datetime1->diff($datetimeInicio)->m != 0  || $datetime1->diff($datetimeInicio)->y != 0){
+			while ( $datetimeFin->diff($datetimeInicio)->m != 0  || $datetimeFin->diff($datetimeInicio)->y != 0){
 				$dias[] =  $datetimeInicio->format('Y-m').'-01';
 				$datetimeInicio->add(new DateInterval('P1M'));
 			}
@@ -163,7 +120,8 @@ class Accounts_DataInvoice_Action extends Vtiger_Action_Controller {
 		$datetimeFin = new DateTime($fin);
 		$datetimeInicio = new DateTime($inicio);
 		$intervalo = 0;
-		if ($datetimeFin->diff($datetimeInicio)->d < 30 && $datetimeFin->diff($datetimeInicio)->m < 1) {
+		if ($datetimeFin->diff($datetimeInicio)->d < 30 && $datetimeFin->diff($datetimeInicio)->m < 1
+			&& $datetimeFin->diff($datetimeInicio)->y < 1) {
 			//86400000 son los milisegundos en un dia, segun la cantidad de dias
 			// modifica el intervalo
 			if($datetimeFin->diff($datetimeInicio)->d < 11)
@@ -174,8 +132,8 @@ class Accounts_DataInvoice_Action extends Vtiger_Action_Controller {
 				$intervalo = 86400000*3;
 		}else{
 			// 2592000000 son los milisegundos en 30 dias
-			if($datetimeFin->diff($datetimeInicio)->y < 1)
-				$intervalo = 2592000000*2;
+			if ($datetimeFin->diff($datetimeInicio)->m < 7 && $datetimeFin->diff($datetimeInicio)->y < 1)
+				$intervalo = 2592000000;
 			else
 				$intervalo = 2592000000*2*($datetimeFin->diff($datetimeInicio)->y + 1);
 		}
@@ -184,18 +142,18 @@ class Accounts_DataInvoice_Action extends Vtiger_Action_Controller {
 
 	function fechaMinima($recordId){
 		global $adb;
-		$resultado = $adb->pquery("SELECT DATE_FORMAT(MIN(invoicedate), '%Y-%m') as 'date' FROM vtiger_invoice WHERE accountid = ?;", array($recordId));
+		$resultado = $adb->pquery("SELECT DATE_FORMAT(MIN(invoicedate), '%Y-%m-%d') as 'date' FROM vtiger_invoice WHERE accountid = ?;", array($recordId));
 		if($adb->num_rows($resultado) > 0)
-			return $resultado->fields['date'].'-01';
+			return $resultado->fields['date'];
 		else
 			return null;
 	}
 
 	function fechaMaxima($recordId){
 		global $adb;
-		$resultado = $adb->pquery("SELECT DATE_FORMAT(MAX(invoicedate), '%Y-%m') as 'date' FROM vtiger_invoice WHERE accountid = ?;", array($recordId));
+		$resultado = $adb->pquery("SELECT DATE_FORMAT(MAX(invoicedate), '%Y-%m-%d') as 'date' FROM vtiger_invoice WHERE accountid = ?;", array($recordId));
 		if($adb->num_rows($resultado) > 0)
-			return $resultado->fields['date'].'-01';
+			return $resultado->fields['date'];
 		else
 			return null;
 	}
@@ -203,26 +161,26 @@ class Accounts_DataInvoice_Action extends Vtiger_Action_Controller {
 	function consulta($recordId, $fechaInicio, $fechaFin, $intervalo){
 		$resultado = null;
 		global $adb;
-		if($intervalo > 2592000000){
-			if ($finalDate != null && $initialDate != null) {
-				$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate between ? and ? group by DATE_FORMAT(invoicedate, '%Y-%c');", array($recordId, $initialDate, $finalDate));
+		if($intervalo >= 2592000000){
+			if ($fechaFin != null && $fechaInicio != null) {
+				$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate between ? and ? group by DATE_FORMAT(invoicedate, '%Y-%c');", array($recordId, $fechaInicio, $fechaFin));
 			}else{
-				if ($finalDate != null ) {
-					$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate <= ? group by DATE_FORMAT(invoicedate, '%Y-%c')", array($recordId, $finalDate));
-				}elseif ($initialDate != null) {
-					$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate >= ? group by DATE_FORMAT(invoicedate, '%Y-%c')", array($recordId, $initialDate));
+				if ($fechaFin != null ) {
+					$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate <= ? group by DATE_FORMAT(invoicedate, '%Y-%c')", array($recordId, $fechaFin));
+				}elseif ($fechaInicio != null) {
+					$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate >= ? group by DATE_FORMAT(invoicedate, '%Y-%c')", array($recordId, $fechaInicio));
 				}else{
 					$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? group by DATE_FORMAT(invoicedate, '%Y-%c');", array($recordId));
 				}
 			}
 		}else{
-			if ($finalDate != null && $initialDate != null) {
-				$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m-%d') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate between ? and ? group by invoicedate;", array($recordId, $initialDate, $finalDate));
+			if ($fechaFin != null && $fechaInicio != null) {
+				$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m-%d') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate between ? and ? group by invoicedate;", array($recordId, $fechaInicio, $fechaFin));
 			}else{
-				if ($finalDate != null ) {
-					$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m-%d') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate <= ? group by invoicedate", array($recordId, $finalDate));
-				}elseif ($initialDate != null) {
-					$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m-%d') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate >= ? group by invoicedate", array($recordId, $initialDate));
+				if ($fechaFin != null ) {
+					$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m-%d') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate <= ? group by invoicedate", array($recordId, $fechaFin));
+				}elseif ($fechaInicio != null) {
+					$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m-%d') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? and invoicedate >= ? group by invoicedate", array($recordId, $fechaInicio));
 				}else{
 					$resultado = $adb->pquery("SELECT DATE_FORMAT(invoicedate, '%Y-%m-%d') as 'date', sum(total) as 'total' FROM vtiger_invoice WHERE accountid = ? group by invoicedate;", array($recordId));
 				}
