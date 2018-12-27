@@ -107,7 +107,7 @@ class Accounts_DataInvoice_Action extends Vtiger_Action_Controller {
 		}else{
 			//si hay error en la consulta o el resultado no tiene valores da error
 			$result['success'] = false;
-			if ($resultado) {
+			if (!$resultado) {
 				$result['error'] = 'Error en la consulta';
 			} else {
 				$result['error'] = 'No hay facturas entre las fechas elegidas';
