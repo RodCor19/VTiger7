@@ -2,6 +2,7 @@
 <div class="plot" id="chart"></div>
 <br>
 <div>
+  <button id="Prueba" class="btn btn-success">Buscar</button>
   <table class="table table-borderless">
     <tbody id='fields'>
       <tr><td class="fieldLabel alignMiddle"><label>Inicio :</label></td><td class="fieldValue"><input class="inputElement" type="date" name="Inicio"></td></tr>
@@ -71,6 +72,25 @@
         },
         function(error,err){
 
+        }
+        );
+    });
+    $('#Prueba').click(function(e) {
+      var campoInicio = $("#fields .inputElement")[0];
+      var campoFin = $("#fields .inputElement")[1];
+      var params = {
+        'module' : 'Accounts',
+        'action' : 'DataInvoice',
+        'record' : record,
+        'inicio' : $(campoInicio).val(),
+        'fin' : $(campoFin).val()
+      };
+      app.request.get({data:params}).then(
+        function(error,data) {
+          console.log(data);
+        },
+        function(error,err){
+          console.log(error);
         }
         );
     });
