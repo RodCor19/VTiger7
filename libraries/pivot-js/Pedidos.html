@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="es" lang="es-es">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>Facturación</title>
+  <!-- Twitter Bootstrap -->
+  <link rel="stylesheet" href="./lib/css/bootstrap.min.css" type="text/css" />
+  <link rel="stylesheet" href="./lib/css/subnav.css" type="text/css" />
+  <link rel="stylesheet" href="./lib/css/pivot.css" type="text/css" />
+
+  
+  <link rel="stylesheet" href="../themes/softed/style.css" type="text/css" />
+  
+
+  <script type="text/javascript" src="./lib/jquery.min.js"></script>
+  <script type="text/javascript" src="./lib/javascripts/subnav.js"></script>
+  <script type="text/javascript" src="./lib/javascripts/accounting.min.js"></script>
+  <script type="text/javascript" src="./lib/javascripts/jquery.dataTables.js"></script>
+  <script type="text/javascript" src="./lib/javascripts/dataTables.rangeFilter.js"></script>
+  <script type="text/javascript" src="./lib/javascripts/dataTables.bootstrap.js"></script>
+
+
+
+  <!-- jquery_pivot must be loaded after pivot.js and jQuery -->
+  <script type="text/javascript" src="./pivot.js"></script>
+  <script type="text/javascript" src="./pedidos.js"></script>
+  <script type="text/javascript" src="./jquery_pivot.js"></script>
+  <style type="text/css">
+.auto-style1 {
+	font-size: x-large;
+}
+</style>
+</head>
+
+<body>
+
+  <div class="container" style="width: 98%">
+      <b>
+	  <table style="width: 100%">
+		  <tr>
+			  <td>
+			  <img alt="" height="24" src="../include/images/logo_ludere.gif" width="112"></td>
+			  <td class="pagination-right"><span class="auto-style1" lang="es"><span class="moduleName" lang="es">Análisis de Pedidos</span></span><span lang="es"><span class="auto-style1"></span></span>
+	  </b></td>
+		  </tr>
+	  </table>
+	  &nbsp;</p>
+    <div class="subnav">
+      <ul class="nav nav-pills">
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            Filtros
+            <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu stop-propagation" style="overflow:auto;max-height:450px;padding:10px;">
+            <div id="filter-list"></div>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            Filas
+            <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu stop-propagation" style="overflow:auto;max-height:450px;padding:10px;">
+            <div id="row-label-fields"></div>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            Columnas
+            <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu stop-propagation" style="overflow:auto;max-height:450px;padding:10px;">
+            <div id="column-label-fields"></div>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            Indicadores
+            <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu stop-propagation" style="overflow:auto;max-height:450px;padding:10px;">
+            <div id="summary-fields"></div>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:tableToExcel('pivot-table','Resultados');">
+            Exportar Excel
+            <b class="caret"></b>
+          </a>
+        </li>
+        <li class="dropdown pull-right">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            Reportes predefinidos
+            <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu">
+           <li><a id="Fac_Cue_mes" href="#">Pedidos por Cuenta Mes</a></li>
+           <li><a id="Fac_cli" href="#">Pedidos por Cliente</a></li>
+           <li><a id="Fac_ser" href="#"><span lang="es">Pedidos por Artículo</span></a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    <hr/>
+    
+    <div class="showPanelBg" style="padding:15px;">
+      <h1 class="moduleName">Resultados</h1>
+      <span id="pivot-detail"></span>
+
+      <hr/>
+      <div id="results"></div>
+      Desde
+      <input type="text" name="min" id="min">
+      Hasta
+      <input type="text" name="max" id="max">
+    </div>
+  </div>
+</body>

@@ -1,0 +1,60 @@
+<html>
+	<head>
+		<title>NReco.PivotTable Extensions Example</title>
+		<link href="js/pivot.css" rel="stylesheet" />
+
+		<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.min.js"></script>	
+		<script src="js/jquery-ui-1.9.2.custom.min.js"></script>
+		<script src="js/pivot.js"></script>
+		<script src="js/gchart_renderers.js"></script>
+		<script src="js/nrecopivot.js"></script>		
+	</head>
+	<body>
+	
+	<h1>PivotTable.js NReco Extensions Example</h1>
+	<div id="samplePivotTable"></div>
+	
+<script type="text/javascript">
+	$(function () {
+		var sampleData = [{ "Year": 2011, "Total": "8800", "Country": "United States", "ID": 1, "Customer": "Orlando Rivas" }, { "Year": 2011, "Total": "6331", "Country": "Germany", "ID": 2, "Customer": "Jeremy Morton" }, { "Year": 2012, "Total": "7981", "Country": "United States", "ID": 3, "Customer": "Keane Powers" }, { "Year": 2011, "Total": "8324", "Country": "United States", "ID": 4, "Customer": "Nigel Hood" }, { "Year": 2010, "Total": "8875", "Country": "Spain", "ID": 5, "Customer": "Blaze Pearson" }, { "Year": 2014, "Total": "9602", "Country": "Spain", "ID": 6, "Customer": "Emmanuel Goff" }, { "Year": 2013, "Total": "6942", "Country": "Spain", "ID": 7, "Customer": "Kane Mcpherson" }, { "Year": 2014, "Total": "8384", "Country": "France", "ID": 8, "Customer": "Jermaine Page" }, { "Year": 2014, "Total": "5807", "Country": "Italy", "ID": 9, "Customer": "Merritt Boyle" }, { "Year": 2011, "Total": "6969", "Country": "United Kingdom", "ID": 10, "Customer": "Scott Briggs" }];
+		
+		var nrecoPivotExt = new NRecoPivotTableExtensions({
+			drillDownHandler: function (dataFilter) {
+				console.log(dataFilter);
+				
+				var filterParts = [];
+				for (var k in dataFilter) {
+					filterParts.push(k+"="+dataFilter[k]);
+				}
+				alert( filterParts.join(", "));	
+				
+			}
+		});
+		
+		var stdRendererNames = ["Table","Table Barchart","Heatmap","Row Heatmap","Col Heatmap"];
+		var wrappedRenderers = $.extend( {}, $.pivotUtilities.renderers);
+		$.each(stdRendererNames, function() {
+			var rName = this;
+			wrappedRenderers[rName] = nrecoPivotExt.wrapTableRenderer(wrappedRenderers[rName]);
+		});
+		
+		var pvtOpts = {
+			renderers: wrappedRenderers,
+			rendererOptions: { sort: { direction : "desc", column_key : [ 2014 ]} },
+			vals: ["Total"],
+			rows: ["Country"],
+			cols: ["Year"],
+			aggregatorName : "Sum"
+		}
+
+
+		$('#samplePivotTable').pivotUI(sampleData, pvtOpts);
+	});
+
+
+</script>
+	
+	
+	
+	</body>
+</html>
