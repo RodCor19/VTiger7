@@ -4,34 +4,6 @@ class Analisis_vmensuales_View extends Vtiger_View_Controller {
 		return true;
 	}
 
-	public function getHeaderScripts(Vtiger_Request $request) {
-		$headerScriptInstances = parent::getHeaderScripts($request);
-		$moduleName = $request->getModule();
-
-		$jsFileNames = array(
-			"~/libraries/jquery/jqplot/jquery.jqplot.min.js",
-			"~/libraries/jquery/jqplot/plugins/jqplot.dateAxisRenderer.js",
-			"~/libraries/jquery/jqplot/plugins/jqplot.canvasAxisRenderer.js",
-			"~/libraries/jquery/jqplot/plugins/jqplot.highlighter.min.js",
-			"~/libraries/jquery/jqplot/plugins/jqplot.cursor.min.js",
-			"~/libraries/jquery/jqplot/plugins/jqplot.pointLabels.min.js",
-		);
-
-		$jsScriptInstances = $this->checkAndConvertJsScripts($jsFileNames);
-		$headerScriptInstances = array_merge($headerScriptInstances, $jsScriptInstances);
-		return $headerScriptInstances;
-	}
-
-	public function getHeaderCss(Vtiger_Request $request) {
-		$headerCssInstances = parent::getHeaderCss($request);
-		$cssFileNames = array(
-			"~/libraries/jquery/jqplot/jquery.jqplot.min.css",
-		);
-		$cssInstances = $this->checkAndConvertCssStyles($cssFileNames);
-		$headerCssInstances = array_merge($headerCssInstances, $cssInstances);
-		return $headerCssInstances;
-	}
-
 
 	public function process(Vtiger_Request $request) {
 		global $adb;
@@ -73,8 +45,6 @@ class Analisis_vmensuales_View extends Vtiger_View_Controller {
 		$viewer->assign('valores', $tuplas);
 		$viewer->assign('intervalo', $intervalo);
 		$viewer->assign('modo', 'Mensual');
-		$viewer->assign('SCRIPTS', $this->getHeaderScripts($request));
-	  	$viewer->assign('STYLES', $this->getHeaderCss($request));
 		$viewer->view('Grafica.tpl', $moduleName);
 	}
 

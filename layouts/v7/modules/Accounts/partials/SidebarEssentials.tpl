@@ -18,7 +18,7 @@
                         <input type="hidden" name="allCvId" value="0">
                         <ul class="lists-menu">
                             <li style="font-size:12px;" class="listViewFilter"> 
-                                <a class="filterName listViewFilterElipsis" href="index.php?module=Accounts&view=List&viewname=&app=SALES" title="Ventas diarias" oncontextmenu="return false;" data-filter-id="51">Ventas diarias</a> 
+                                <a class="filterName listViewFilterElipsis" href="index.php?module=Accounts&view=List&viewname=vdiarias&app=SALES" title="Ventas diarias" oncontextmenu="return false;" data-filter-id="vdiarias">Ventas diarias</a> 
                                 <div class="pull-right">
                                     <span class="js-popover-container" style="cursor:pointer;">
                                         <span class="fa fa-angle-down" rel="popover" data-toggle="popover" aria-expanded="true" toggleclass="fa fa-square-o"  data-defaulttoggle="index.php?module=Accounts&view=List&viewname=&app=SALES" data-default="index.php?module=Accounts&view=List&viewname=&app=SALES" data-ismine="true" data-original-title="" title="">
@@ -27,10 +27,10 @@
                                 </div>
                             </li>
                             <li style="font-size:12px;" class="listViewFilter"> 
-                                <a class="filterName listViewFilterElipsis" href="index.php?module=Accounts&view=List&viewname=vmensuales&app=SALES" title="Ventas mensuales" oncontextmenu="return false;" data-filter-id="8">Ventas mensuales</a> 
+                                <a class="filterName listViewFilterElipsis" href="index.php?module=Accounts&view=List&viewname=vmensuales&app=SALES" title="Ventas mensuales" oncontextmenu="return false;" data-filter-id="vmensuales">Ventas mensuales</a> 
                                 <div class="pull-right">
                                     <span class="js-popover-container" style="cursor:pointer;">
-                                        <span class="fa fa-angle-down" rel="popover" data-toggle="popover" aria-expanded="true">
+                                        <span class="fa fa-angle-down" rel="popover" data-toggle="popover" aria-expanded="true" toggleclass="fa fa-square-o"  data-defaulttoggle="index.php?module=Accounts&view=List&viewname=&app=SALES" data-default="index.php?module=Accounts&view=List&viewname=&app=SALES" data-ismine="true" data-original-title="" title="">
                                         </span>
                                     </span>
                                 </div>

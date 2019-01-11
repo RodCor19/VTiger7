@@ -19,17 +19,17 @@ class PBXManager_List_View extends Vtiger_List_View {
 			$this->viewName = $viewName;
 		}
 
-		$this->initializeListViewContents($request, $viewer);
-		$this->assignCustomViews($request, $viewer);
-		$viewer->assign('VIEW', $request->get('view'));
-		$viewer->assign('MODULE_MODEL', $moduleModel);
-		$viewer->assign('RECORD_ACTIONS', $this->getRecordActionsFromModule($moduleModel));
-		$viewer->assign('CURRENT_USER_MODEL', Users_Record_Model::getCurrentUserModel());
+			$this->initializeListViewContents($request, $viewer);
+			$this->assignCustomViews($request, $viewer);
+			$viewer->assign('VIEW', $request->get('view'));
+			$viewer->assign('MODULE_MODEL', $moduleModel);
+			$viewer->assign('RECORD_ACTIONS', $this->getRecordActionsFromModule($moduleModel));
+			$viewer->assign('CURRENT_USER_MODEL', Users_Record_Model::getCurrentUserModel());
 
-		$viewer->assign('IS_CREATE_PERMITTED', false);
-		$viewer->assign('IS_MODULE_EDITABLE', false);
-		$viewer->assign('IS_MODULE_DELETABLE', false);
-		$viewer->view('ListViewContents.tpl', $moduleName);
+			$viewer->assign('IS_CREATE_PERMITTED', false);
+			$viewer->assign('IS_MODULE_EDITABLE', false);
+			$viewer->assign('IS_MODULE_DELETABLE', false);
+			$viewer->view('ListViewContents.tpl', $moduleName);
 	}
 
 	public function getRecordActionsFromModule($moduleModel) {

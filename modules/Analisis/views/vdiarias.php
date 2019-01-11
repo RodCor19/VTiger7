@@ -3,7 +3,6 @@ class Analisis_vdiarias_View extends Vtiger_View_Controller {
 	public function checkPermission(Vtiger_Request $request) {
 		return true;
 	}
-
 	public function getHeaderScripts(Vtiger_Request $request) {
 		$headerScriptInstances = parent::getHeaderScripts($request);
 		$moduleName = $request->getModule();
@@ -35,6 +34,8 @@ class Analisis_vdiarias_View extends Vtiger_View_Controller {
 	public function process(Vtiger_Request $request) {
 		global $adb;
 		$viewer = $this->getViewer($request);
+		//$viewer->assign('SCRIPTS',$this->getHeaderScripts($request));
+	  	//$viewer->assign('STYLES',$this->getHeaderCss($request));
 		$moduleName = $request->getModule();
 		//inicializar variables
 		$tuplas = null;
@@ -69,13 +70,9 @@ class Analisis_vdiarias_View extends Vtiger_View_Controller {
 			$viewer->assign('itemsLabels', '%d-%m');
 			$viewer->assign('label', vtranslate("LBL_DAYS_TYPE", 'Accounts'));
 		}
-		$datetimeFin = new DateTime($fechaFin);
-		$datetimeInicio = new DateTime($fechaInicio);
 		$viewer->assign('valores', $tuplas);
 		$viewer->assign('intervalo', $intervalo);
 		$viewer->assign('modo', 'Diario');
-		$viewer->assign('SCRIPTS',$this->getHeaderScripts($request));
-	  	$viewer->assign('STYLES',$this->getHeaderCss($request));
 		$viewer->view('Grafica.tpl', $moduleName);
 	}
 
